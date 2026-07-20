@@ -1,0 +1,14 @@
+{
+  "seed": 1337,
+  "ratios": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "counts": {
+    "train": 497,
+    "val": 105,
+    "test": 103
+  },
+  "assignment_sha256": "e0c7cd24b14a16632ba99497aa1c59b7f7579b5fe070eb91194d71954cab634e"
+}
