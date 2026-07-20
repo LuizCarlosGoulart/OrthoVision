@@ -22,7 +22,10 @@ Implementation — ingestion + validation:
 - `orthovision.hashing.sha256_file` — streaming content hash.
 - `orthovision.ingest.store` — immutable raw-store ingestion; idempotent on
   unchanged sources, raises `ImmutabilityError` on changed content (unless
-  `--overwrite`).
+  `--overwrite`). DENTEX ships images inside zips, so ingestion is zip-aware
+  (`ingest_archives`): it extracts only the members selected by the `archives`
+  map in `configs/data/dentex.yaml`, dropping `unlabelled/` and notebook
+  checkpoints, and lays files out at `<split>/<subset>/[annotations/]<basename>`.
 - `orthovision.ingest.manifest` — deterministic JSONL manifest (records sorted by
   `file`) with `{file, sha256, bytes, source, license}`.
 - `orthovision.ingest.dentex` — Hugging Face snapshot download (lazy import) +
@@ -38,10 +41,18 @@ Implementation — ingestion + validation:
 
 ```
 pip install -e ".[dev]"
-python scripts/ingest_dentex.py      # downloads DENTEX, then ingests
+python scripts/ingest_dentex.py      # downloads DENTEX (~11.8GB), extracts zips, ingests
 python scripts/validate_dentex.py    # writes manifests/validation.dentex.json
 python -m pytest                     # offline; no network needed
 ```
+
+## Result on real data
+
+Ingested 2585 files (2332 images + 253 annotations). Validation: 2332 images,
+2332 passed, 0 excluded. Diagnosis subset (v1 target): 705 train images + COCO
+annotation, 250 test images + per-image labels, 50 val images (challenge holdout,
+no labels). Auxiliary reserved subsets: quadrant (693), quadrant_enumeration
+(634). `unlabelled` (1571) and notebook checkpoints dropped by policy.
 
 ## Completion criteria (from the ADD roadmap)
 

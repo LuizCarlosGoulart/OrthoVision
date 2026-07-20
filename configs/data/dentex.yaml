@@ -34,6 +34,28 @@ dataset:
       labels: [quadrant, enumeration, diagnosis]
       use: v1
 
+  # Archive extraction map. DENTEX ships its images inside zips; the ingestor
+  # extracts matching members into the raw store at <split>/<subset>/<basename>
+  # (annotations under <split>/<subset>/annotations/). Members matching `exclude`
+  # anywhere in their path are skipped. `unlabelled` (no diagnosis labels) and
+  # notebook checkpoints are dropped for v1.
+  exclude:
+    - ".ipynb_checkpoints/"
+    - "unlabelled/"
+  archives:
+    training_data.zip:
+      - { include: "training_data/quadrant-enumeration-disease/xrays/", split: train, subset: diagnosis }
+      - { include: "training_data/quadrant/xrays/",                     split: train, subset: quadrant }
+      - { include: "training_data/quadrant_enumeration/xrays/",         split: train, subset: quadrant_enumeration }
+      - { include: "training_data/quadrant-enumeration-disease/train_quadrant_enumeration_disease.json", split: train, subset: diagnosis, kind: annotation }
+      - { include: "training_data/quadrant/train_quadrant.json",                              split: train, subset: quadrant, kind: annotation }
+      - { include: "training_data/quadrant_enumeration/train_quadrant_enumeration.json",      split: train, subset: quadrant_enumeration, kind: annotation }
+    test_data.zip:
+      - { include: "disease/input/", split: test, subset: diagnosis }
+      - { include: "disease/label/", split: test, subset: diagnosis, kind: annotation }
+    validation_data.zip:
+      - { include: "validation_data/quadrant_enumeration_disease/xrays/", split: val, subset: diagnosis }
+
   # Diagnostic label space — the canonical multi-label target.
   pathologies:
     - { key: caries,            granularity: local }

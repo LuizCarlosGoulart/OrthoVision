@@ -8,10 +8,11 @@ source whose content differs from an already-stored file is a hard error unless
 from __future__ import annotations
 
 import shutil
+import zipfile
 from pathlib import Path
-from typing import Iterable, Iterator
+from typing import Any, Iterable, Iterator
 
-from ..hashing import sha256_file
+from ..hashing import sha256_bytes, sha256_file
 from .manifest import IngestionRecord
 
 IMAGE_EXTS: frozenset[str] = frozenset({".png", ".jpg", ".jpeg"})
@@ -70,5 +71,100 @@ def ingest_images(
                 license=license,
             )
         )
+
+    return records
+
+
+def _write_immutable(dst: Path, data: bytes, digest: str, overwrite: bool) -> None:
+    """Write bytes to the raw store, enforcing immutability of existing files."""
+    if dst.exists():
+        if sha256_file(dst) != digest:
+            if not overwrite:
+                raise ImmutabilityError(
+                    f"raw file already exists with different content: {dst}"
+                )
+            dst.write_bytes(data)
+        # identical content -> idempotent
+    else:
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_bytes(data)
+
+
+def _match_rule(member: str, rules: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """Return the first rule whose ``include`` prefix matches the zip member."""
+    for rule in rules:
+        if member.startswith(rule["include"]):
+            return rule
+    return None
+
+
+def _find_archive(snapshot_dir: str | Path, name: str) -> Path:
+    for p in Path(snapshot_dir).rglob(name):
+        if p.is_file():
+            return p
+    raise FileNotFoundError(f"archive not found in snapshot: {name}")
+
+
+def ingest_archives(
+    snapshot_dir: str | Path,
+    raw_dir: str | Path,
+    archives: dict[str, list[dict[str, Any]]],
+    exclude: Iterable[str],
+    source: str,
+    license: str,
+    *,
+    overwrite: bool = False,
+) -> list[IngestionRecord]:
+    """Extract selected members from the dataset zips into the immutable raw store.
+
+    ``archives`` maps a zip basename to a list of rules
+    ``{include: <path-prefix>, split, subset, kind?}``. A member is ingested when
+    it matches an include prefix, is not excluded, and matches the rule ``kind``
+    (image extensions for ``image``; ``.json`` for ``annotation``). Files land at
+    ``<split>/<subset>/[annotations/]<basename>`` under ``raw_dir``.
+    """
+    raw_dir = Path(raw_dir)
+    exclude = list(exclude or [])
+    records: list[IngestionRecord] = []
+
+    for zip_name, rules in archives.items():
+        archive = _find_archive(snapshot_dir, zip_name)
+        with zipfile.ZipFile(archive) as zf:
+            for member in sorted(zf.namelist()):
+                if member.endswith("/"):
+                    continue
+                if any(token in member for token in exclude):
+                    continue
+                rule = _match_rule(member, rules)
+                if rule is None:
+                    continue
+
+                kind = rule.get("kind", "image")
+                ext = Path(member).suffix.lower()
+                if kind == "image" and ext not in IMAGE_EXTS:
+                    continue
+                if kind == "annotation" and ext != ".json":
+                    continue
+
+                data = zf.read(member)
+                digest = sha256_bytes(data)
+                rel = Path(rule["split"]) / rule["subset"]
+                if kind == "annotation":
+                    rel = rel / "annotations"
+                rel = rel / Path(member).name
+                _write_immutable(raw_dir / rel, data, digest, overwrite)
+
+                records.append(
+                    IngestionRecord(
+                        file=rel.as_posix(),
+                        sha256=digest,
+                        bytes=len(data),
+                        source=source,
+                        license=license,
+                        split=rule["split"],
+                        subset=rule["subset"],
+                        kind=kind,
+                    )
+                )
 
     return records

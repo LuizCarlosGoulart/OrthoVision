@@ -9,7 +9,7 @@ from pathlib import Path
 
 from ..config import load_config, paths, resolve_path
 from .manifest import IngestionRecord, write_manifest
-from .store import ingest_images
+from .store import ingest_archives
 
 
 def download_snapshot(repo_id: str, revision: str | None = None) -> Path:
@@ -32,9 +32,11 @@ def run_ingest(
     if src_dir is None:
         src_dir = download_snapshot(data_cfg["source"]["repo_id"])
 
-    records = ingest_images(
-        src_dir,
-        raw_dir,
+    records = ingest_archives(
+        snapshot_dir=src_dir,
+        raw_dir=raw_dir,
+        archives=data_cfg["archives"],
+        exclude=data_cfg.get("exclude", []),
         source=data_cfg["name"],
         license=data_cfg["license"],
         overwrite=overwrite,

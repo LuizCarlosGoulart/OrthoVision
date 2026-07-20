@@ -12,3 +12,8 @@ def sha256_file(path: str | Path, chunk_size: int = 1 << 20) -> str:
         for block in iter(lambda: fh.read(chunk_size), b""):
             h.update(block)
     return h.hexdigest()
+
+
+def sha256_bytes(data: bytes) -> str:
+    """Return the hex sha256 of an in-memory buffer (e.g. a zip member)."""
+    return hashlib.sha256(data).hexdigest()

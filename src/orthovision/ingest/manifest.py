@@ -19,6 +19,9 @@ class IngestionRecord:
     bytes: int
     source: str
     license: str
+    split: str | None = None      # train | test | val
+    subset: str | None = None     # diagnosis | quadrant | quadrant_enumeration
+    kind: str = "image"           # image | annotation
 
 
 def write_manifest(records: Iterable[IngestionRecord], path: str | Path) -> Path:
