@@ -1,0 +1,21 @@
+# Data store — never committed; versioned via manifests + checksums / DVC
+/data/raw/**
+/data/interim/**
+/data/processed/**
+!/data/**/.gitkeep
+
+# Experiment outputs — versioned via model registry, not git
+/experiments/**
+!/experiments/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.ipynb_checkpoints/
+
+# Local overrides / secrets (e.g. TDD access token)
+.env
+configs/**/local.*.yaml

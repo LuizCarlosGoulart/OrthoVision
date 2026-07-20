@@ -1,0 +1,16 @@
+# F0 ingestion policy. Governs how raw data enters the immutable store.
+ingest:
+  datasets: [dentex]          # v1: DENTEX only (ADR 0001)
+
+  # Immutability + provenance. Every ingested file gets a sha256 recorded in the
+  # ingestion manifest; the raw store is written once and never mutated.
+  checksum: sha256
+  overwrite_raw: false        # re-ingest into a new versioned path instead
+  record_license: true        # persist license + source URL alongside bytes
+
+  # Determinism: the ingestor must produce an identical ingestion manifest given
+  # the same source revision. A checksum mismatch on re-download is a hard error.
+  fail_on_checksum_mismatch: true
+
+  # Output: an ingestion manifest listing {file, sha256, bytes, source, license}.
+  ingestion_manifest: manifests/ingestion.dentex.jsonl

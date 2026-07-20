@@ -1,0 +1,12 @@
+# Canonical paths. All other configs reference these keys; nothing hardcodes a
+# path elsewhere. Paths are relative to the repository root unless absolute.
+paths:
+  raw_dir:        data/raw
+  interim_dir:    data/interim
+  processed_dir:  data/processed
+  manifests_dir:  manifests
+  experiments_dir: experiments
+
+  # Per-dataset raw subtrees (immutable once written).
+  dentex_raw:     data/raw/dentex
+  tdd_raw:        data/raw/tdd   # unused in v1 (see ADR 0001), reserved

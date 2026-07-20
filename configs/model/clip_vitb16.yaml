@@ -1,0 +1,11 @@
+# Reference backbone: generic CLIP ViT-B/16. Used only to quantify the
+# domain-pretraining gap (generic vs BiomedCLIP). Not an adaptation target in v1.
+model:
+  name: clip_vitb16
+  role: reference
+  framework: open_clip
+  arch: ViT-B-16
+  pretrained: laion2b_s34b_b88k
+  image_size: 224
+  context_length: 77
+  tokenizer: open_clip_default

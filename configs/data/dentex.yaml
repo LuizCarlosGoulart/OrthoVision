@@ -1,0 +1,37 @@
+# DENTEX dataset source specification (primary, v1).
+# License: CC-BY. Direct download; no access form required.
+dataset:
+  name: dentex
+  role: primary
+  license: CC-BY
+  modality: panoramic_xray
+  language: en
+  specialty: dentistry
+
+  # Source of record. Checksums are filled in by the ingestor on first download
+  # and then treated as immutable; a mismatch on re-download is a hard failure.
+  source:
+    provider: huggingface
+    repo_id: ibrahimhamamci/DENTEX
+    # Mirrors kept for provenance / reproducibility.
+    mirrors:
+      - https://zenodo.org/records/7812323
+      - https://dentex.grand-challenge.org/data/
+
+  # DENTEX hierarchical subsets. Only `diagnosis` carries the 4-pathology labels
+  # used by the v1 supervised task. The other two are reserved for optional
+  # auxiliary pretext tasks and, if used, MUST enter the same patient-grouping
+  # table as the split (no data leaks in as "extra").
+  subsets:
+    quadrant:            { images: 693,  labels: [quadrant] }
+    quadrant_enumeration:{ images: 634,  labels: [quadrant, enumeration] }
+    diagnosis:           { images: 1005, labels: [quadrant, enumeration, diagnosis], use: v1 }
+
+  # Diagnostic label space — the canonical multi-label target.
+  pathologies:
+    - { key: caries,            granularity: local }
+    - { key: deep_caries,       granularity: local }
+    - { key: periapical_lesion, granularity: local }
+    - { key: impacted_tooth,    granularity: global }
+
+  reliability: strong   # expert-annotated; authoritative ground truth

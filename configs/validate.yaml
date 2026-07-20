@@ -1,0 +1,15 @@
+# Conformance rules applied right after ingestion. Fail-early: a record that
+# violates a hard rule is excluded and reported, never silently passed downstream.
+validate:
+  image:
+    min_resolution: [512, 256]   # [w, h] floor for a usable panoramic
+    allowed_formats: [png, jpg, jpeg]
+    require_readable: true       # must decode without error
+
+  label:
+    # For the v1 supervised (diagnosis) subset, a usable diagnosis annotation is
+    # required; records without one are excluded from the supervised view.
+    require_diagnosis_for: diagnosis
+
+  # Output: a conformance report (counts of pass / excluded-by-rule) written per run.
+  report: manifests/validation.dentex.json

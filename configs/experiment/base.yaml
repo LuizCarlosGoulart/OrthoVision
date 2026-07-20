@@ -1,0 +1,21 @@
+# Base experiment template. Concrete experiments inherit this and override the
+# strategy / backbone. Every run is identified by run_id = date + config_hash + seed.
+experiment:
+  seed: 1337
+  backbone: biomedclip        # configs/model/*.yaml
+  strategy: zero_shot         # zero_shot | linear_probe | coop | lora | lora_coop
+  task: multilabel            # 4-pathology multi-label
+  loss: bce_with_logits       # multi-label; not softmax
+  prompts:
+    template: "a panoramic dental x-ray showing {pathology}"
+
+  # Provenance recorded with every run (see §8 of the ADD).
+  provenance:
+    config_hash: auto
+    data_manifest_hash: auto
+    test_split_hash: auto
+
+  # Feature cache is only valid when the image encoder is frozen (zero_shot,
+  # linear_probe, coop). Must be disabled/invalidated for lora / full fine-tune.
+  feature_cache:
+    enabled_when_encoder_frozen: true

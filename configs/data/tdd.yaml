@@ -1,0 +1,23 @@
+# Tufts Dental Database (TDD) source specification.
+# RESERVED — not used in v1 (see docs/adr/0001-v1-dentex-only.md).
+# Present so the later contrastive phase requires no structural change.
+dataset:
+  name: tdd
+  role: secondary
+  status: reserved            # do not ingest for v1 training
+  license: request-form       # requires approval at tdd.ece.tufts.edu
+  modality: panoramic_xray
+  language: en
+  specialty: dentistry
+
+  source:
+    provider: tufts-ece
+    url: https://tdd.ece.tufts.edu/
+    mirror: https://www.kaggle.com/datasets/tommyngx/the-tufts-dental-database-2022
+
+  # TDD contributes free-text descriptions for the future contrastive view and a
+  # weak auxiliary label only. It NEVER alters the DENTEX ground truth or test set.
+  reliability: weak
+  contributes:
+    - text_description        # primary reason to use TDD later
+    - weak_label              # best-effort mapping to the 4 pathologies

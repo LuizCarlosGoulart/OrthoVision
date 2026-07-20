@@ -1,0 +1,13 @@
+# Image normalization. Deterministic; runs before dedup and split.
+preprocess:
+  intensity:
+    window: percentile        # clip to [p_low, p_high] then rescale
+    p_low: 0.5
+    p_high: 99.5
+  channels: grayscale_to_rgb  # 16-bit grayscale -> 3 channels for CLIP encoders
+  resize:
+    target: 224               # backbone input (ViT-B/16 / BiomedCLIP)
+    keep_aspect_ratio: true
+    pad: true                 # pad instead of stretch to preserve geometry
+  # Cropping strategy for the local-signal (caries) question is an experiment
+  # variable, NOT fixed here; candidate strategies live in configs/experiment/*.

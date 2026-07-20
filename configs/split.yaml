@@ -1,0 +1,14 @@
+# Partitioning. The single point that guarantees leakage-free splits.
+# Runs AFTER dedup, BEFORE any augmentation or feature caching.
+split:
+  ratios: { train: 0.70, val: 0.15, test: 0.15 }
+  group_by: patient_group_id  # all radiographs of a patient stay in one split
+  stratify_by: pathology_cooccurrence  # balance multi-label co-occurrence
+  seed: 1337                  # fixed; the split is a versioned artifact
+  # The test split is FROZEN and SHARED by every model/strategy comparison.
+  freeze_test: true
+  outputs:
+    train: manifests/train.jsonl
+    val:   manifests/val.jsonl
+    test:  manifests/test.jsonl
+    assignment_hash: manifests/split.hash.json  # provenance for reproducibility

@@ -1,0 +1,9 @@
+# Domain backbone: BiomedCLIP (PubMed-pretrained). Primary adaptation target.
+model:
+  name: biomedclip
+  role: domain_base
+  framework: open_clip
+  hf_hub: microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224
+  image_size: 224
+  context_length: 256         # BiomedCLIP text encoder
+  tokenizer: hf_hub_same_as_model

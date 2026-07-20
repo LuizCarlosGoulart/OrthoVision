@@ -1,0 +1,9 @@
+# Deduplication. Runs AFTER normalization and BEFORE split. Removes exact and
+# near-duplicate images both within DENTEX and across datasets (DENTEX<->TDD when
+# TDD is later added), so no equivalent image spans more than one record/split.
+dedup:
+  method: phash               # perceptual hash
+  hamming_threshold: 5        # <= threshold => treated as duplicate
+  scope: [intra, inter]       # within-dataset and cross-dataset
+  on_conflict: keep_strongest # keep the record with the strongest reliability
+  report: manifests/dedup.report.json
