@@ -1,0 +1,8 @@
+{
+  "input": 705,
+  "kept": 705,
+  "removed": 0,
+  "groups": [],
+  "removed_map": {},
+  "hamming_threshold": 10
+}

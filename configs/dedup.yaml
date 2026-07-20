@@ -2,8 +2,16 @@
 # near-duplicate images both within DENTEX and across datasets (DENTEX<->TDD when
 # TDD is later added), so no equivalent image spans more than one record/split.
 dedup:
-  method: phash               # perceptual hash
-  hamming_threshold: 5        # <= threshold => treated as duplicate
+  method: dhash               # difference hash (PIL-only)
+  # Hash resolution matters in this domain: all panoramic X-rays share global
+  # anatomy, so a low-resolution 64-bit hash collapses distinct patients together
+  # (empirically flagged 54 false duplicates at threshold 5). A 256-bit hash
+  # (16x16) separates them: on DENTEX train the nearest pair is 32/256 bits apart,
+  # i.e. there are no true (near-)duplicates. Threshold 10 catches only
+  # near-identical rescans (relevant later for inter-dataset TDD overlap) while
+  # removing nothing from DENTEX train.
+  hash_size: 16               # 16x16 => 256-bit dhash
+  hamming_threshold: 10       # <= threshold => treated as duplicate
   scope: [intra, inter]       # within-dataset and cross-dataset
   on_conflict: keep_strongest # keep the record with the strongest reliability
   report: manifests/dedup.report.json

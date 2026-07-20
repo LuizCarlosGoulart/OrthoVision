@@ -7,3 +7,4 @@ references the previous one.
 | ADR | Title | Status | Date |
 |-----|-------|--------|------|
 | [0001](0001-v1-dentex-only.md) | v1 DENTEX-only; contrastive/TDD deferred to a later phase | Accepted | 2026-07-20 |
+| [0002](0002-supervised-set-train-coco-only.md) | v1 supervised set = 705 train-COCO images only | Accepted | 2026-07-20 |
