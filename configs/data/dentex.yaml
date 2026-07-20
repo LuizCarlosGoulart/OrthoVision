@@ -23,9 +23,16 @@ dataset:
   # auxiliary pretext tasks and, if used, MUST enter the same patient-grouping
   # table as the split (no data leaks in as "extra").
   subsets:
-    quadrant:            { images: 693,  labels: [quadrant] }
-    quadrant_enumeration:{ images: 634,  labels: [quadrant, enumeration] }
-    diagnosis:           { images: 1005, labels: [quadrant, enumeration, diagnosis], use: v1 }
+    quadrant:
+      images: 693
+      labels: [quadrant]
+    quadrant_enumeration:
+      images: 634
+      labels: [quadrant, enumeration]
+    diagnosis:
+      images: 1005
+      labels: [quadrant, enumeration, diagnosis]
+      use: v1
 
   # Diagnostic label space — the canonical multi-label target.
   pathologies:

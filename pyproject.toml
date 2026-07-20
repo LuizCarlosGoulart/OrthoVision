@@ -5,9 +5,16 @@ description = "Fine-tuning CLIP for diagnosis on dental panoramic radiographs (O
 requires-python = ">=3.10"
 readme = "README.md"
 
-# Dependencies are intentionally not pinned during F0 (scaffold phase).
-# They will be added and locked when ingestion/validation logic lands (F0 impl).
-dependencies = []
+# F0 runtime dependencies (ingestion + validation). Model/training deps
+# (open_clip, torch, ...) are added in later phases when that code lands.
+dependencies = [
+    "huggingface-hub>=0.24",
+    "pillow>=10.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -15,3 +22,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

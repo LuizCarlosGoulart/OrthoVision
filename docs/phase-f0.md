@@ -3,9 +3,11 @@
 **Objective:** deterministic ingestion of DENTEX into an immutable, checksummed
 raw store, with a conformance validation report. DENTEX only (ADR 0001).
 
-## Current state (scaffold)
+## State
 
-Done in this step — structure and declarative configuration, no pipeline logic:
+Scaffold and implementation done.
+
+Scaffold — structure and declarative configuration:
 
 - Repository skeleton (`src/orthovision/*`, `configs/`, `data/`, `manifests/`,
   `docs/`, `tests/`, `scripts/`, `experiments/`).
@@ -14,16 +16,32 @@ Done in this step — structure and declarative configuration, no pipeline logic
   `experiment/base`.
 - Docs: ADD (`architecture.md`), repository layout, canonical schema, ADR 0001.
 
-## Remaining F0 work (implementation)
+Implementation — ingestion + validation:
 
-1. `ingest/` — download DENTEX from the configured source, write bytes to
-   `data/raw/dentex` once, compute sha256 per file, emit
-   `manifests/ingestion.dentex.jsonl` with `{file, sha256, bytes, source,
-   license}`. Hard-fail on checksum mismatch on re-download.
-2. `validate/` — apply `configs/validate.yaml` rules, emit
-   `manifests/validation.dentex.json` with pass / excluded-by-rule counts.
-3. `tests/` — assert raw immutability (no overwrite) and that every ingested file
-   appears in the ingestion manifest with a hash.
+- `orthovision.config` — YAML config loading and repo-root path resolution.
+- `orthovision.hashing.sha256_file` — streaming content hash.
+- `orthovision.ingest.store` — immutable raw-store ingestion; idempotent on
+  unchanged sources, raises `ImmutabilityError` on changed content (unless
+  `--overwrite`).
+- `orthovision.ingest.manifest` — deterministic JSONL manifest (records sorted by
+  `file`) with `{file, sha256, bytes, source, license}`.
+- `orthovision.ingest.dentex` — Hugging Face snapshot download (lazy import) +
+  `run_ingest`. `scripts/ingest_dentex.py` is the CLI.
+- `orthovision.validate.rules` / `report` — image conformance (format, readable,
+  resolution) + JSON report with per-reason counts. `scripts/validate_dentex.py`
+  is the CLI.
+- `tests/` — 12 tests covering config load, hashing, ingest (hash coverage,
+  deterministic manifest, immutability) and validation. All green
+  (`python -m pytest`).
+
+## How to run
+
+```
+pip install -e ".[dev]"
+python scripts/ingest_dentex.py      # downloads DENTEX, then ingests
+python scripts/validate_dentex.py    # writes manifests/validation.dentex.json
+python -m pytest                     # offline; no network needed
+```
 
 ## Completion criteria (from the ADD roadmap)
 
