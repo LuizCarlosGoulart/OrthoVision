@@ -63,4 +63,12 @@ dataset:
     - { key: periapical_lesion, granularity: local }
     - { key: impacted_tooth,    granularity: global }
 
+  # Mapping from DENTEX disease category name (COCO categories_3) to the canonical
+  # pathology key. Name-based (robust to category id ordering).
+  diagnosis_label_map:
+    Impacted: impacted_tooth
+    Caries: caries
+    "Periapical Lesion": periapical_lesion
+    "Deep Caries": deep_caries
+
   reliability: strong   # expert-annotated; authoritative ground truth
