@@ -7,7 +7,7 @@ raw store, with a conformance validation report. DENTEX only (ADR 0001).
 
 Done in this step — structure and declarative configuration, no pipeline logic:
 
-- Repository skeleton (`src/clip_dental/*`, `configs/`, `data/`, `manifests/`,
+- Repository skeleton (`src/orthovision/*`, `configs/`, `data/`, `manifests/`,
   `docs/`, `tests/`, `scripts/`, `experiments/`).
 - Declarative configs: `paths`, `data/dentex`, `data/tdd` (reserved), `ingest`,
   `validate`, `preprocess`, `dedup`, `split`, `model/{biomedclip,clip_vitb16}`,

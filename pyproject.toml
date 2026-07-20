@@ -1,7 +1,7 @@
 [project]
-name = "clip-dental"
+name = "orthovision"
 version = "0.0.0"
-description = "Fine-tuning CLIP for diagnosis on dental panoramic radiographs (OdontoCLIP)"
+description = "Fine-tuning CLIP for diagnosis on dental panoramic radiographs (OrthoVision)"
 requires-python = ">=3.10"
 readme = "README.md"
 

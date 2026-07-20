@@ -1,4 +1,4 @@
-# OdontoCLIP
+# OrthoVision
 
 Fine-tuning CLIP for diagnosis on dental panoramic radiographs.
 
@@ -26,7 +26,7 @@ logic implemented yet.
 | `configs/` | Declarative configuration (single source of truth for params/paths) |
 | `data/` | Local data store (git-ignored; versioned by manifest + checksum) |
 | `manifests/` | Versioned JSONL canonical records and split assignments |
-| `src/clip_dental/` | Pipeline packages (ingest → … → inference) |
+| `src/orthovision/` | Pipeline packages (ingest → … → inference) |
 | `experiments/` | Per-run outputs (checkpoints, logs, metrics); git-ignored |
 | `tests/` | Pipeline invariants (leakage, schema) |
 | `scripts/` | Thin CLI entrypoints |

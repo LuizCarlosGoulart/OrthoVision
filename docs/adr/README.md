@@ -1,6 +1,6 @@
 # Architecture Decision Records (ADR)
 
-Record of architectural decisions for the OdontoCLIP project. Each ADR is
+Record of architectural decisions for the OrthoVision project. Each ADR is
 immutable once accepted; a change of direction is captured as a new ADR that
 references the previous one.
 

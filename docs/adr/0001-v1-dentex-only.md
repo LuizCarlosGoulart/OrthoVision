@@ -3,7 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-07-20
 - **Project context:** Fine-tuning CLIP for diagnosis on dental panoramic
-  radiographs (OdontoCLIP). Backbones: generic CLIP (ViT-B/16) as reference and
+  radiographs (OrthoVision). Backbones: generic CLIP (ViT-B/16) as reference and
   BiomedCLIP as domain base. Approved datasets: DENTEX (primary) and Tufts Dental
   Database — TDD (secondary).
 

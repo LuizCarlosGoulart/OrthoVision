@@ -1,4 +1,4 @@
-# Architecture Design Document — OdontoCLIP
+# Architecture Design Document — OrthoVision
 
 Fine-tuning CLIP for diagnosis on dental panoramic radiographs.
 
@@ -121,7 +121,7 @@ data_manifest_hash + seed recorded.
 
 ## 9. Scalability
 
-Extension axis: `manifests/` (canonical record) + `src/clip_dental/labels/`
+Extension axis: `manifests/` (canonical record) + `src/orthovision/labels/`
 (per-source mappers). New dataset -> new mapper only. New specialty -> `specialty`
 stops being constant, label space namespaced per specialty via `configs/`; no
 directory or training-loop change. New modality -> `modality` gains a branch in
