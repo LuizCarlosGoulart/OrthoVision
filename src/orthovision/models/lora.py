@@ -25,8 +25,11 @@ class LoRALinear(nn.Module):
         self.base.weight.requires_grad_(False)
         if self.base.bias is not None:
             self.base.bias.requires_grad_(False)
-        self.A = nn.Parameter(torch.zeros(rank, base.in_features))
-        self.B = nn.Parameter(torch.zeros(base.out_features, rank))
+        # Create the low-rank factors on the base layer's device/dtype so LoRA
+        # works even when injected after the model is moved to GPU.
+        device, dtype = base.weight.device, base.weight.dtype
+        self.A = nn.Parameter(torch.zeros(rank, base.in_features, device=device, dtype=dtype))
+        self.B = nn.Parameter(torch.zeros(base.out_features, rank, device=device, dtype=dtype))
         nn.init.kaiming_uniform_(self.A, a=math.sqrt(5))
         self.scale = alpha / rank
 
