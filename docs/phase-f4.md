@@ -29,20 +29,24 @@ works. Real numbers come from the GPU/Colab run below.
 
 ## Real run (deferred to GPU/Colab)
 
-`python scripts/run_lora.py` with `train_limit: null`, more epochs. Compared
-against F3 baselines on the frozen test fold, per the ADD §7 gates:
-- macro-AUC above BiomedCLIP zero-shot and generic zero-shot;
-- no per-class regression vs the linear probe (F3);
-- **caries AUC strictly above the linear probe (0.552)** — the decisive gate for
-  the central hypothesis;
-- ECE no worse than zero-shot.
+Use **`notebooks/colab_train.ipynb`**: it clones the repo, installs `.[models]`,
+materializes the data (`scripts/ingest_dentex.py`), runs the full ladder + LoRA on
+GPU, and evaluates the gates with bootstrap CIs. Or locally:
+`python scripts/run_lora.py` with `train_limit: null` and more epochs.
+
+Gates (ADD §7), implemented in `eval/gates.py`, compared on the frozen test fold:
+- **g1** macro-AUC above BiomedCLIP zero-shot and generic zero-shot;
+- **g2** no per-class regression vs the linear probe (F3);
+- **g3** **caries AUC strictly above the linear probe (0.552)** — decisive for the
+  central hypothesis; significance via `eval/bootstrap.paired_delta_ci` (CI
+  excluding 0);
+- **g4** ECE no worse than zero-shot — **not yet evaluated** (calibration TODO).
 
 ## Tests
 
-LoRA unit tests (identity init, only A/B trainable, target wrapping). Full suite
-green.
+LoRA unit tests + bootstrap/gates tests. Full suite green (51).
 
 ## Gaps carried forward
 
-- Bootstrap CIs for the gates (ADD §7) not yet computed.
+- Gate 4 (ECE/calibration) not implemented.
 - Run registry (config_hash/data_manifest_hash) still minimal.
