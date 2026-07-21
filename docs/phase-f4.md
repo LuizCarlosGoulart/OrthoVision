@@ -39,6 +39,27 @@ signal we target. Response: added flip augmentation + val early stopping and
 raised the epoch budget to 15 (early stopping selects the best epoch). Re-run
 pending.
 
+## Second GPU run (rank 8, 15 epochs, flip aug + val early stopping)
+
+**Central hypothesis confirmed.** LoRA adaptation lifts the hard local signal:
+
+| pathology | probe | LoRA | Δ |
+|---|---|---|---|
+| caries (local, target) | 0.552 | **0.661** | **+0.109** |
+| impacted (global) | 0.708 | **0.783** | +0.075 |
+| deep_caries (local) | 0.633 | 0.589 | −0.044 |
+| periapical (local) | 0.690 | 0.603 | −0.087 |
+| macro | 0.646 | **0.659** | +0.013 |
+
+Gates: g1 pass, **g3 (caries > probe) pass** — the decisive gate. g2 fails: two
+classes regress (deep_caries, periapical). periapical has only 17 test positives
+(high variance). Overfitting from run 1 is gone (macro now beats the probe).
+Interpretation: a single macro-AUC-selected checkpoint trades gains on the classes
+the frozen encoder underserved (caries, impacted) for small losses on the two the
+probe already read well — likely a class-imbalance effect. Next lever:
+class-balanced BCE (`pos_weight`) to recover deep_caries/periapical without losing
+caries.
+
 ## Real run (deferred to GPU/Colab)
 
 Use **`notebooks/colab_train.ipynb`**: it clones the repo, installs `.[models]`,
