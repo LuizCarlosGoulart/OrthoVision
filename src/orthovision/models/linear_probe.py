@@ -25,7 +25,8 @@ def train_linear_probe(
     """Fit a Linear(D, n_classes) with BCEWithLogitsLoss on frozen features."""
     torch.manual_seed(seed)
     n_classes = labels.shape[1]
-    probe = torch.nn.Linear(features.shape[1], n_classes)
+    probe = torch.nn.Linear(features.shape[1], n_classes).to(features.device)
+    labels = labels.to(features.device)
     opt = torch.optim.AdamW(probe.parameters(), lr=lr, weight_decay=weight_decay)
     loss_fn = torch.nn.BCEWithLogitsLoss()
     probe.train()
