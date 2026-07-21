@@ -1,0 +1,22 @@
+# LoRA adaptation of the BiomedCLIP image encoder (F4). Inherits the spirit of
+# experiment/base.yaml; overrides strategy and adds LoRA/training knobs.
+experiment:
+  seed: 1337
+  backbone: biomedclip
+  strategy: lora
+  task: multilabel
+  loss: bce_with_logits
+
+  lora:
+    rank: 8
+    alpha: 16
+    targets: [qkv, proj, fc1, fc2]   # timm ViT: attention (qkv/proj) + MLP (fc1/fc2)
+
+  train:
+    epochs: 5
+    batch_size: 16
+    lr: 5.0e-4
+    weight_decay: 1.0e-4
+    # null = all 497 train images (use GPU/Colab). Set a small int for a local
+    # CPU functional run; the numbers are then not the real result.
+    train_limit: null

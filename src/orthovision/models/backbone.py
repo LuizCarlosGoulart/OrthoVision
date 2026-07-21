@@ -60,6 +60,10 @@ class Backbone:
         std = torch.tensor(self.std).view(3, 1, 1)
         return (t - mean) / std
 
+    def image_batch(self, paths: Sequence[str | Path]) -> torch.Tensor:
+        """Stack preprocessed image tensors for ``paths`` (grad-enabled path)."""
+        return torch.stack([self._to_tensor(p) for p in paths]).to(self.device)
+
     @torch.no_grad()
     def encode_images(self, paths: Sequence[str | Path], batch_size: int = 16) -> torch.Tensor:
         feats: list[torch.Tensor] = []
