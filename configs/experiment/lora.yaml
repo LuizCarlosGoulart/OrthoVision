@@ -13,7 +13,7 @@ experiment:
     targets: [qkv, proj, fc1, fc2]   # timm ViT: attention (qkv/proj) + MLP (fc1/fc2)
 
   train:
-    epochs: 5
+    epochs: 15          # early stopping selects the best-val epoch (curbs overfit)
     batch_size: 16
     lr: 5.0e-4
     weight_decay: 1.0e-4

@@ -12,7 +12,10 @@ ADR 0003 (LoRA + linear head; CoOp deferred).
   (`qkv`, `proj`) and MLP (`fc1`, `fc2`) linears — all plain modules.
 - **models/lora_train.py** — freezes the backbone, injects LoRA, trains LoRA
   params + a linear head with BCE (multi-label). Same head as the F3 probe, so the
-  comparison isolates the encoder adaptation.
+  comparison isolates the encoder adaptation. Anti-overfit measures (added after
+  the first GPU run overfit — see below): **random horizontal-flip augmentation**
+  (pathology presence is flip-invariant) and **validation-based early stopping**
+  (the best-val-macro-AUC epoch is restored).
 - **configs/experiment/lora.yaml** — rank/alpha/targets and training knobs;
   `train_limit` caps train images for local CPU runs (null = all 497 on GPU/Colab).
 
@@ -26,6 +29,15 @@ Run: `python scripts/run_lora.py --limit 48 --epochs 2` (device cpu). A tiny tra
 subset over 2 epochs is far too little to learn 4 pathologies, so the AUCs are not
 meaningful — the run only confirms the loss decreases and the eval/metrics path
 works. Real numbers come from the GPU/Colab run below.
+
+## First GPU run (rank 8, 5 epochs, no regularization)
+
+macro AUC: lora 0.629 vs probe 0.646 — LoRA **underperformed** the frozen probe,
+with local dropping (0.598 vs 0.625) while global rose (0.719 vs 0.708). Training
+loss fell to 0.09 → clear overfitting on 497 images, hurting exactly the local
+signal we target. Response: added flip augmentation + val early stopping and
+raised the epoch budget to 15 (early stopping selects the best epoch). Re-run
+pending.
 
 ## Real run (deferred to GPU/Colab)
 
