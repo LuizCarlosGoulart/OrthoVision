@@ -15,6 +15,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
+# Model/training stack (F3+). Kept optional so the data pipeline (F0-F2) stays light.
+models = ["torch>=2.2", "open_clip_torch>=2.24", "transformers>=4.40"]
 
 [build-system]
 requires = ["setuptools>=68"]

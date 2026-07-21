@@ -8,6 +8,14 @@ experiment:
   loss: bce_with_logits       # multi-label; not softmax
   prompts:
     template: "a panoramic dental x-ray showing {pathology}"
+  # Per-class positive prompts for zero-shot scoring (cosine similarity of the
+  # image embedding to each prompt is the per-class score; AUC is rank-based so
+  # no cross-class calibration is needed).
+  class_prompts:
+    caries: "a panoramic dental radiograph showing dental caries"
+    deep_caries: "a panoramic dental radiograph showing deep dental caries reaching the pulp"
+    periapical_lesion: "a panoramic dental radiograph showing a periapical lesion at the tooth root"
+    impacted_tooth: "a panoramic dental radiograph showing an impacted tooth"
 
   # Provenance recorded with every run (see §8 of the ADD).
   provenance:
