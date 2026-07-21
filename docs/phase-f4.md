@@ -41,24 +41,29 @@ pending.
 
 ## Second GPU run (rank 8, 15 epochs, flip aug + val early stopping)
 
-**Central hypothesis confirmed.** LoRA adaptation lifts the hard local signal:
+Point estimates favor the hypothesis, but **bootstrap CIs show the single small
+test fold is underpowered** — the caries gain is not statistically significant.
 
-| pathology | probe | LoRA | Δ |
-|---|---|---|---|
-| caries (local, target) | 0.552 | **0.661** | **+0.109** |
-| impacted (global) | 0.708 | **0.783** | +0.075 |
-| deep_caries (local) | 0.633 | 0.589 | −0.044 |
-| periapical (local) | 0.690 | 0.603 | −0.087 |
-| macro | 0.646 | **0.659** | +0.013 |
+| pathology | probe | LoRA | Δ | LoRA 95% CI |
+|---|---|---|---|---|
+| caries (local, target) | 0.552 | 0.661 | +0.109 | [0.463, 0.830] |
+| impacted (global) | 0.708 | 0.783 | +0.075 | [0.685, 0.868] |
+| deep_caries (local) | 0.633 | 0.589 | −0.044 | [0.480, 0.698] |
+| periapical (local) | 0.690 | 0.603 | −0.087 | [0.446, 0.754] |
+| macro | 0.646 | 0.659 | +0.013 | — |
 
-Gates: g1 pass, **g3 (caries > probe) pass** — the decisive gate. g2 fails: two
-classes regress (deep_caries, periapical). periapical has only 17 test positives
-(high variance). Overfitting from run 1 is gone (macro now beats the probe).
-Interpretation: a single macro-AUC-selected checkpoint trades gains on the classes
-the frozen encoder underserved (caries, impacted) for small losses on the two the
-probe already read well — likely a class-imbalance effect. Next lever:
-class-balanced BCE (`pos_weight`) to recover deep_caries/periapical without losing
-caries.
+Paired caries delta (LoRA − probe): **+0.111, CI [−0.055, +0.304] — includes 0**,
+so not significant at α=0.05. Root cause: the test fold has only 103 images, and
+caries has just **9 negatives** (94/103 positive) while periapical has **17
+positives** — both extremes are noisy. Only **impacted_tooth is solidly above
+chance** (CI lower bound 0.685). The g2 "regressions" are likewise within wide CIs.
+
+**Honest status: the central hypothesis is NOT yet confirmed** — the pattern is
+favorable but the evaluation is underpowered. The fix is methodological, not a
+hyperparameter: **k-fold patient-aware stratified cross-validation** pools all 705
+images for evaluation (caries would have ~82 negatives, periapical ~116 positives),
+tightening the CIs enough to test the effect. `pos_weight` is a secondary refinement
+that only makes sense once evaluation has power.
 
 ## Real run (deferred to GPU/Colab)
 
