@@ -65,6 +65,16 @@ images for evaluation (caries would have ~82 negatives, periapical ~116 positive
 tightening the CIs enough to test the effect. `pos_weight` is a secondary refinement
 that only makes sense once evaluation has power.
 
+## K-fold cross-validation (statistically-powered evaluation)
+
+The single test fold is underpowered (caries ~9 negatives). `split/kfold.py` +
+`models/cv.py` (`scripts/run_cv.py`, notebook §7) run k-fold patient-aware
+stratified CV and pool out-of-fold predictions over all 705 images, so caries gets
+~82 negatives and periapical ~116 positives — tightening the CIs enough to test the
+effect. LoRA is retrained per fold (k trainings); zero-shot/probe reuse features
+encoded once. The decisive readout is the pooled caries LoRA−probe delta CI: if it
+excludes 0, the encoder adaptation significantly lifts the local signal.
+
 ## Real run (deferred to GPU/Colab)
 
 Use **`notebooks/colab_train.ipynb`**: it clones the repo, installs `.[models]`,
