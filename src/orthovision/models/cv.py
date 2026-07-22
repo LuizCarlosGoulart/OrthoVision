@@ -6,9 +6,13 @@ Pooling the out-of-fold predictions gives per-class AUC + bootstrap CIs on the f
 705 — far more statistical power than a single 103-image test fold.
 
 Compute note: LoRA is retrained per fold (encoder adapts), so k backbone trainings.
-Zero-shot / probe reuse features encoded once per backbone.
+Zero-shot / probe reuse features encoded once per backbone. For LoRA early stopping,
+a small validation slice is carved from the training folds (not the held-out test
+fold), so the test fold stays clean and the scheme works for any k.
 """
 from __future__ import annotations
+
+import random
 
 import torch
 
@@ -72,12 +76,17 @@ def run_cv(*, k: int = 5, device: str = "cpu", epochs: int | None = None, limit:
         _fill(oof["probe"], PATHOLOGY_KEYS, probe_scores(probe, feats[te], PATHOLOGY_KEYS), te)
     del bb, feats
 
-    # ---- LoRA per fold (fresh backbone; val = next fold for early stopping) ----
+    # ---- LoRA per fold (fresh backbone; carve a val slice from train for
+    #      early stopping — works for any k and keeps the test fold untouched) ----
+    val_frac = 0.15
     for f in range(k):
-        val_f = (f + 1) % k
-        tr = [i for i in range(n) if folds[i] != f and folds[i] != val_f]
-        va = [i for i in range(n) if folds[i] == val_f]
         te = [i for i in range(n) if folds[i] == f]
+        non_test = [i for i in range(n) if folds[i] != f]
+        shuffled = non_test[:]
+        random.Random(seed + f).shuffle(shuffled)
+        n_val = max(1, int(len(shuffled) * val_frac))
+        va = sorted(shuffled[:n_val])
+        tr = sorted(shuffled[n_val:])
         print(f"  [fold {f}] train={len(tr)} val={len(va)} test={len(te)}")
         bb = load_backbone(load_config("model/biomedclip"), pre, device)
         y_tr = torch.tensor([[records[i].labels[key] for key in PATHOLOGY_KEYS] for i in tr], dtype=torch.float32).to(device)
